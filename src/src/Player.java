@@ -9,6 +9,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import javafx.geometry.Rectangle2D;
@@ -85,7 +86,7 @@ public class Player implements WalkAble,ChargeAble{
         player = new ImageView(new Image(getClass().getResourceAsStream("/res/player_currentRight.png")));
         player.setFitWidth(40);
         player.setFitHeight(40);
-        player.setTranslateX(45);
+        player.setTranslateX(60);
         player.setTranslateY(45);
         player.translateXProperty().addListener((obs, old, newValue) -> {
             int offset = newValue.intValue();
@@ -109,11 +110,11 @@ public class Player implements WalkAble,ChargeAble{
                     case '0':
                         break;
                     case '1':
-                        Node platform = createEntity(j * 60, i * 60, 60, 60, Color.BROWN);
+                        Node platform = createEntity(j * 60, i * 60, 60, 60, "/res/wall.png");
                         platforms.add(platform);
                         break;
                     case '2':
-                        Node coin = createEntity(j*60, i*60, 60, 60, Color.GOLD);
+                        Node coin = createEntity(j*60, i*60, 60, 60, "/res/treasure.png");
                         coins.add(coin);
                         break;
                 }
@@ -437,11 +438,12 @@ public class Player implements WalkAble,ChargeAble{
     }
 
 
-    private Node createEntity(double x, double y, double w, double h, Color color) {
+    private Node createEntity(double x, double y, double w, double h, String path) {
 		Rectangle entity = new Rectangle(w, h);
         entity.setTranslateX(x);
         entity.setTranslateY(y);
-        entity.setFill(color);
+        Image image = new Image(path);
+        entity.setFill(new ImagePattern(image));
         entity.getProperties().put("alive", true);
         return entity;
 	}
@@ -452,6 +454,10 @@ public class Player implements WalkAble,ChargeAble{
 
 	public boolean isDialogEvent() {
 		return dialogEvent;
+	}
+
+	public void setDialogEvent(boolean dialogEvent) {
+		this.dialogEvent = dialogEvent;
 	}
     
     

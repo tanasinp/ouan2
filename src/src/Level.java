@@ -13,7 +13,7 @@ public class Level {
 
 	public Level(Pane gameRoot) {
 		background = new Rectangle(1280, 720);
-
+//		background.setFill(Color.WHITE);
         
 
 		// Define your level layout and create platforms here

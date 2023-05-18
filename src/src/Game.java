@@ -46,6 +46,7 @@ public class Game extends Pane {
                 }
                 
                 if (player.isDialogEvent()) {
+                	player.setDialogEvent(false);
                 	GameDialog dialog = new GameDialog();
                 	dialog.open();
                 }
