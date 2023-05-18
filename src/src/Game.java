@@ -18,6 +18,7 @@ public class Game extends Pane {
     private Level level;
     private Player player;
     private boolean running = true;
+    private static Sound sound;
 
     public void init(Stage primaryStage) {
         level = new Level(gameRoot);
@@ -28,6 +29,10 @@ public class Game extends Pane {
         Scene scene = new Scene(appRoot);
         scene.setOnKeyPressed(event -> keys.put(event.getCode(), true));
         scene.setOnKeyReleased(event -> keys.put(event.getCode(), false));
+        
+        sound = new Sound();
+        sound.playSound();
+        
         primaryStage.setTitle("Jump! JUMP! JUmp! :)");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -39,13 +44,18 @@ public class Game extends Pane {
                 if (running) {
                     update();
                 }
+                
+                if (player.isDialogEvent()) {
+                	GameDialog dialog = new GameDialog();
+                	dialog.open();
+                }
             }
         };
         timer.start();
     }
 
     private void update() {
-        player.update();
+        player.update(gameRoot);
 
         // Handle collisions or other game logic here
     }
