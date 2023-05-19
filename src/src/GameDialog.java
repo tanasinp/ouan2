@@ -25,9 +25,9 @@ public class GameDialog {
         dialogPane.getChildren().add(message);
     }
 
-    public void open(Pane uiRoot) {
+    public void open(Pane congratRoot) {
         dialogPane.setTranslateX(400);
         dialogPane.setTranslateY(300);
-        uiRoot.getChildren().add(dialogPane);
+        congratRoot.getChildren().add(dialogPane);
     }
 }

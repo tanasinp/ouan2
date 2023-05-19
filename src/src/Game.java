@@ -2,9 +2,14 @@ package src;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.HashMap;
@@ -14,10 +19,9 @@ public class Game extends Pane {
 
     private Pane appRoot = new Pane();
     private Pane gameRoot = new Pane();
-    private Pane uiRoot = new Pane();
+    private Pane congratRoot = new Pane();
     private Pane menuRoot = new Pane();
 
-    private Level level;
     private Player player;
     private boolean running = true;
     private static Sound sound;
@@ -25,12 +29,16 @@ public class Game extends Pane {
     private MenuPane menuPane;
 
     public void init(Stage primaryStage) {
-        level = new Level(gameRoot);
+    	primaryStage.setMaxHeight(720);
+    	primaryStage.setMaxWidth(1280);
+    	primaryStage.setMinHeight(720);
+    	primaryStage.setMinWidth(1280);
         player = new Player(gameRoot, keys);
         dialog = new GameDialog();
         menuPane = new MenuPane(menuRoot, this);
         
-        appRoot.getChildren().addAll(level.getBackground(), gameRoot, uiRoot);
+        appRoot.getChildren().addAll(gameRoot, congratRoot);
+        appRoot.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, null, null)));
         appRoot.setVisible(false);
 
         menuRoot.getChildren().addAll(appRoot);
@@ -60,7 +68,7 @@ public class Game extends Pane {
 
                 if (player.isDialogEvent()) {
                     player.setDialogEvent(false);
-                    Platform.runLater(() -> dialog.open(uiRoot));
+                    Platform.runLater(() -> dialog.open(congratRoot));
                     sound.stopSound();
                 }
             }

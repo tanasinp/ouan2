@@ -24,10 +24,11 @@ public class Player implements WalkAble,ChargeAble{
 //    private Node player;
     private HashMap<KeyCode, Boolean> keys;
     private int levelWidth;
-	private ArrayList<Node> platforms = new ArrayList<>();
 	private Point2D playerVelocity = new Point2D(0, 0);
 	private ImageView player;// =  new ImageView(new Image(getClass().getResourceAsStream("/res/player_currentRight.png")));
+	private ArrayList<Node> platforms = new ArrayList<>();
 	private ArrayList<Node> coins = new ArrayList<Node>();
+	private ArrayList<Node> spikes = new ArrayList<>();
 	private boolean dialogEvent = false;
 	
 	public String pastDirection = "right";
@@ -110,13 +111,16 @@ public class Player implements WalkAble,ChargeAble{
                     case '0':
                         break;
                     case '1':
-                        Node platform = createEntity(j * 60, i * 60, 60, 60, "/res/wall.png");
+                        Node platform = createEntity(j * 60, i * 60, 60, 60, "/res/block.png");
                         platforms.add(platform);
                         break;
                     case '2':
                         Node coin = createEntity(j * 60, i * 60, 60, 60, "/res/treasure.png");
                         coins.add(coin);
                         break;
+                    case '3':
+                    	Node spike = createEntity(j * 60, i * 60, 60, 60, "/res/spike.png");
+                    	spikes.add(spike);
                 }
             }
         }
@@ -124,6 +128,7 @@ public class Player implements WalkAble,ChargeAble{
         gameRoot.getChildren().add(player);
         gameRoot.getChildren().addAll(platforms);
         gameRoot.getChildren().addAll(coins);
+        gameRoot.getChildren().addAll(spikes);
     }
 
     public void update(Pane gameRoot) {
