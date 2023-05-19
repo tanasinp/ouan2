@@ -1,6 +1,7 @@
 package src;
 
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -19,20 +20,22 @@ public class Game extends Pane {
     private Player player;
     private boolean running = true;
     private static Sound sound;
+    private GameDialog dialog;
 
     public void init(Stage primaryStage) {
         level = new Level(gameRoot);
         player = new Player(gameRoot, keys);
+        dialog = new GameDialog();
 
         appRoot.getChildren().addAll(level.getBackground(), gameRoot, uiRoot);
 
         Scene scene = new Scene(appRoot);
         scene.setOnKeyPressed(event -> keys.put(event.getCode(), true));
         scene.setOnKeyReleased(event -> keys.put(event.getCode(), false));
-        
+
         sound = new Sound();
         sound.playSound();
-        
+
         primaryStage.setTitle("Jump! JUMP! JUmp! :)");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -44,11 +47,11 @@ public class Game extends Pane {
                 if (running) {
                     update();
                 }
-                
+
                 if (player.isDialogEvent()) {
-                	player.setDialogEvent(false);
-                	GameDialog dialog = new GameDialog();
-                	dialog.open();
+                    player.setDialogEvent(false);
+                    Platform.runLater(() -> dialog.open(uiRoot));
+                    sound.stopSound();
                 }
             }
         };

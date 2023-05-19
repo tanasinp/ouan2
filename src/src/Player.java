@@ -26,7 +26,7 @@ public class Player implements WalkAble,ChargeAble{
     private int levelWidth;
 	private ArrayList<Node> platforms = new ArrayList<>();
 	private Point2D playerVelocity = new Point2D(0, 0);
-	private ImageView player =  new ImageView(new Image(getClass().getResourceAsStream("/res/player_currentRight.png")));
+	private ImageView player;// =  new ImageView(new Image(getClass().getResourceAsStream("/res/player_currentRight.png")));
 	private ArrayList<Node> coins = new ArrayList<Node>();
 	private boolean dialogEvent = false;
 	
@@ -87,7 +87,7 @@ public class Player implements WalkAble,ChargeAble{
         player.setFitWidth(40);
         player.setFitHeight(40);
         player.setTranslateX(60);
-        player.setTranslateY(45);
+        player.setTranslateY(60);
         player.translateXProperty().addListener((obs, old, newValue) -> {
             int offset = newValue.intValue();
 
@@ -114,7 +114,7 @@ public class Player implements WalkAble,ChargeAble{
                         platforms.add(platform);
                         break;
                     case '2':
-                        Node coin = createEntity(j*60, i*60, 60, 60, "/res/treasure.png");
+                        Node coin = createEntity(j * 60, i * 60, 60, 60, "/res/treasure.png");
                         coins.add(coin);
                         break;
                 }
@@ -331,7 +331,7 @@ public class Player implements WalkAble,ChargeAble{
             if (player.getBoundsInParent().intersects(coin.getBoundsInParent())) {
             	coin.getProperties().put("alive", false);
                 dialogEvent = true;
-                System.out.println("congrat");
+                //System.out.println("congrat");
             }
         }
         
