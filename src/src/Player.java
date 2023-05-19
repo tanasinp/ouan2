@@ -21,7 +21,8 @@ import ability.ChargeAble;
 import ability.WalkAble;
 
 public class Player implements WalkAble,ChargeAble{
-//    private Node player;
+
+	//    private Node player;
     private HashMap<KeyCode, Boolean> keys;
     private int levelWidth;
 	private Point2D playerVelocity = new Point2D(0, 0);
@@ -30,6 +31,8 @@ public class Player implements WalkAble,ChargeAble{
 	private ArrayList<Node> coins = new ArrayList<Node>();
 	private ArrayList<Node> spikes = new ArrayList<>();
 	private boolean dialogEvent = false;
+	private int count;
+	private boolean death = false;
 	
 	public String pastDirection = "right";
 	public String direction;
@@ -87,7 +90,7 @@ public class Player implements WalkAble,ChargeAble{
         player = new ImageView(new Image(getClass().getResourceAsStream("/res/player_currentRight.png")));
         player.setFitWidth(40);
         player.setFitHeight(40);
-        player.setTranslateX(60);
+        player.setTranslateX(80);
         player.setTranslateY(60);
         player.translateXProperty().addListener((obs, old, newValue) -> {
             int offset = newValue.intValue();
@@ -347,6 +350,12 @@ public class Player implements WalkAble,ChargeAble{
                 gameRoot.getChildren().remove(coin);
             }
         }
+        
+        for (Node spike : spikes) {
+            if (player.getBoundsInParent().intersects(spike.getBoundsInParent())) {
+                reset(player, gameRoot);
+            }
+        }
     }
     
     public void charge() {
@@ -464,9 +473,32 @@ public class Player implements WalkAble,ChargeAble{
 	public void setDialogEvent(boolean dialogEvent) {
 		this.dialogEvent = dialogEvent;
 	}
+
+	public ImageView getPlayer() {
+		return player;
+	}
     
-    
-    
+	public void reset(ImageView player, Pane gameRoot) {
+		death = true;
+		gameRoot.setLayoutX(0);
+        player.setTranslateX(80);
+        player.setTranslateY(60);
+        count += 1;
+//        System.out.println(count);
+        
+	}
+
+	public int getCount() {
+		return count;
+	}
+
+	public boolean isDeath() {
+		return death;
+	}
+
+	public void setDeath(boolean death) {
+		this.death = death;
+	}
     
     
 }
