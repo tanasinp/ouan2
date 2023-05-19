@@ -15,21 +15,27 @@ public class Game extends Pane {
     private Pane appRoot = new Pane();
     private Pane gameRoot = new Pane();
     private Pane uiRoot = new Pane();
+    private Pane menuRoot = new Pane();
 
     private Level level;
     private Player player;
     private boolean running = true;
     private static Sound sound;
     private GameDialog dialog;
+    private MenuPane menuPane;
 
     public void init(Stage primaryStage) {
         level = new Level(gameRoot);
         player = new Player(gameRoot, keys);
         dialog = new GameDialog();
-
+        menuPane = new MenuPane(menuRoot, this);
+        
         appRoot.getChildren().addAll(level.getBackground(), gameRoot, uiRoot);
+        appRoot.setVisible(false);
 
-        Scene scene = new Scene(appRoot);
+        menuRoot.getChildren().addAll(appRoot);
+
+        Scene scene = new Scene(menuRoot);
         scene.setOnKeyPressed(event -> keys.put(event.getCode(), true));
         scene.setOnKeyReleased(event -> keys.put(event.getCode(), false));
 
@@ -41,7 +47,11 @@ public class Game extends Pane {
         primaryStage.show();
     }
 
-    public void startGameLoop() {
+    public Pane getAppRoot() {
+		return appRoot;
+	}
+
+	public void startGameLoop() {
         AnimationTimer timer = new AnimationTimer() {
             public void handle(long now) {
                 if (running) {
