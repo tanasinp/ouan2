@@ -37,7 +37,7 @@ public class Game extends Pane {
     	primaryStage.setMinHeight(760);
     	primaryStage.setMinWidth(1300);
         player = new Player(gameRoot, keys);
-        dialog = new GameDialog();
+        dialog = new GameDialog(player);
         menuPane = new MenuPane(menuRoot, this);
         
         appRoot.getChildren().addAll(gameRoot, congratRoot, deathRoot);

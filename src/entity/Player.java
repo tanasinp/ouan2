@@ -40,9 +40,10 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 	public boolean isCharge ;
 	public  boolean isWalk ;
 	public boolean isFalling ;
+	public boolean isFinish = false;
 	
 	private int chargeTime = 0;
-	private final int maxChargeTime = 50;
+	private final int maxChargeTime = 80;
 	
 	//protected final double gravity = 0.9;
     private double yVelocity; // up 
@@ -128,7 +129,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     	
     	updateWalkImage();
     	
-    	if (!this.isJump && !this.isFalling) { //when player jumping and falling, player cann't walk
+    	if (!this.isJump && !this.isFalling && !isFinish) { //when player jumping and falling, player cann't walk
     		if ((isPressed(KeyCode.A) || isPressed(KeyCode.D)) && !isPressed(KeyCode.SPACE)) { // if it press space bar,will not walk
     			if (isPressed(KeyCode.A) ) { //&& player.getTranslateX() >= 5
     				walkLeft();
@@ -315,6 +316,8 @@ public class Player extends Entity implements WalkAble,ChargeAble{
             if (player.getBoundsInParent().intersects(coin.getBoundsInParent())) {
             	coin.getProperties().put("alive", false);
                 dialogEvent = true;
+                isFinish = true;
+                isWalk = false;
                 //System.out.println("congrat");
             }
         }
@@ -336,7 +339,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     
     public void charge() {
     	if (chargeTime >= maxChargeTime || chargeTime > 0 && !isPressed(KeyCode.SPACE)) {
-    		yVelocity = 10 + Math.pow(chargeTime/5, 1.4);
+    		yVelocity = 10 + Math.pow(chargeTime/7, 1.4);
 		    chargeTime = 0;// clear chargeTime
 		    isJump = true;
 		    isCharge = false;
@@ -349,7 +352,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     	if (this.isWalk) {
     		if (direction.equals("left")) {
     			spriteCounter++;
-    			if (spriteCounter > 5) { //control the player's sprite animation.
+    			if (spriteCounter > 7) { //control the player's sprite animation.
     				if (spriteNum == 1) {
     					spriteNum = 2;
     					player.setImage(new Image(ClassLoader.getSystemResource("player/player2_walkLeft1.png").toString()));
@@ -364,7 +367,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     			}
     		} else if (direction.equals("right")) {
     			spriteCounter++;
-    			if (spriteCounter > 5) { //control the player's sprite animation.
+    			if (spriteCounter > 7) { //control the player's sprite animation.
     				if (spriteNum == 1) {
     					spriteNum = 2;
     					player.setImage(new Image(ClassLoader.getSystemResource("player/player2_walkRight1.png").toString()));

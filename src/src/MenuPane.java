@@ -16,12 +16,17 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 public class MenuPane {
+	private Font font24 = Font.font("Arial", FontWeight.BOLD, 24);
     private Font font48 = Font.font("Arial", FontWeight.BOLD, 48);
     private Font font96 = Font.font("Arial", FontWeight.BOLD, 96);
     private Button start = new Button();
     private Button quit = new Button();
     private Text name = new Text();
     private Game game;
+    private Text control = new Text();
+    private Text control1 = new Text();
+    private Text control2 = new Text();
+    private Text control3 = new Text();
 
     public MenuPane(Pane menuPane, Game game) {
         start.setText("START");
@@ -34,10 +39,22 @@ public class MenuPane {
 
         name.setText("Jump! JUMP! JUmp!");
         name.setFont(font96);
+        
+        control.setText("CONTROL");
+        control1.setText("> Use LEFT/RIGHT ARROW to move left and right!");
+        control2.setText("> Press/Hold SPACEBAR to jump! (the longer you hold the further you go)");
+        control3.setText("> Hold Left/Right arrow while holding jump to jump to that direction");
+        
+        control.setFont(font48);
 
-        VBox vbox = new VBox(20, name, start, quit);
+        control1.setFont(font24);
+        control2.setFont(font24);
+        control3.setFont(font24);
+
+
+        VBox vbox = new VBox(20, name, start, quit, control, control1, control2, control3);
         vbox.setAlignment(Pos.CENTER);
-        vbox.setPadding(new Insets(200, 0, 0, 200));
+        vbox.setPadding(new Insets(100, 0, 0, 200));
 
         start.setOnAction(event -> {
             game.getAppRoot().setVisible(true);
