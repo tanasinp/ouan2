@@ -53,22 +53,42 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     
     public int spriteCounter = 0;
 	public int spriteNum = 1;
+	
+	public int blockSize = 60;
+	public int playerSize = 40;
     
 	public Player(Pane gameRoot, HashMap<KeyCode, Boolean> keys) {
         this.keys = keys;
-        levelWidth = LevelData.LEVEL1[0].length() * 60;
-        levelHeight = LevelData.LEVEL1.length * 60;
+        levelWidth = LevelData.LEVEL1[0].length() * blockSize;
+        levelHeight = LevelData.LEVEL1.length * blockSize;
         setDefaultValues(gameRoot);
-        player.translateXProperty().addListener((obs, old, newValue) -> {
-            int offsetX = newValue.intValue();
-            int offsetY = (int) player.getTranslateY(); // Get the current translateY value
+//        player.translateXProperty().addListener((obs, old, newValue) -> {
+//            int offsetX = newValue.intValue();
+//            int offsetY = (int) player.getTranslateY(); // Get the current translateY value
+//
+//            if (offsetX > 640 && offsetX < levelWidth - 640) {
+//                gameRoot.setLayoutX(-(offsetX - 640));
+//            }
+//
+//            if (offsetY > 360 && offsetY < levelHeight - 360) {
+//                gameRoot.setLayoutY(-(offsetY - 360));
+//            }
+//        });
+        
+        player.translateXProperty().addListener((obs, old, newValueX) -> {
+        	int offsetX = newValueX.intValue();
 
-            if (offsetX > 640 && offsetX < levelWidth - 640) {
-                gameRoot.setLayoutX(-(offsetX - 640));
-            }
+        	if (offsetX > 640 && offsetX < levelWidth - 640) {
+        		gameRoot.setLayoutX(-(offsetX - 640));
+        	}
+        });
+        
+        
+        player.translateYProperty().addListener((obs, old, newValueY) -> {
+            int offsetY = newValueY.intValue();
 
-            if (offsetY > 380 && offsetY < levelHeight - 380) {
-                gameRoot.setLayoutY(-(offsetY - 380));
+            if (offsetY > 360 && offsetY < levelHeight - 360) {
+                gameRoot.setLayoutY(-(offsetY - 360));
             }
         });
 
@@ -79,15 +99,15 @@ public class Player extends Entity implements WalkAble,ChargeAble{
                     case '0':
                         break;
                     case '1':
-                        Node platform = createEntity(j * 60, i * 60, 60, 60, "map/block.png");
+                        Node platform = createEntity(j * blockSize, i * blockSize, blockSize, blockSize, "map/block.png");
                         platforms.add(platform);
                         break;
                     case '2':
-                        Node coin = createEntity(j * 60, i * 60, 60, 60, "map/treasure.png");
+                        Node coin = createEntity(j * blockSize, i * blockSize, blockSize, blockSize, "map/treasure.png");
                         coins.add(coin);
                         break;
                     case '3':
-                    	Node spike = createEntity(j * 60, i * 60, 60, 60, "map/spike.png");
+                    	Node spike = createEntity(j * blockSize, i * blockSize, blockSize, blockSize, "map/spike.png");
                     	spikes.add(spike);
                 }
             }
@@ -103,12 +123,12 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 		player = new ImageView(new Image(ClassLoader.getSystemResource("player/player2_currentRight.png").toString()));
         direction = "right";
         pastDirection = "right";
-        player.setFitWidth(40);
-        player.setFitHeight(40);
-        player.setTranslateX(80);
-        player.setTranslateY(23 * 60);
+        player.setFitWidth(playerSize);
+        player.setFitHeight(playerSize);
+        player.setTranslateX(blockSize);
+        player.setTranslateY(23 * blockSize);
         gameRoot.setLayoutX(0);
-        gameRoot.setLayoutY(-780);
+        gameRoot.setLayoutY(-(720 + blockSize));
         isWalk = true;
         isJump = false;
         isCharge = false;
@@ -125,44 +145,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     	updateWalkImage();
     	
     	if (!this.isJump && !this.isFalling && !isFinish) { //when player jumping and falling, player cann't walk
-    		if ((isPressed(KeyCode.A) || isPressed(KeyCode.D)) && !isPressed(KeyCode.SPACE)) { // if it press space bar,will not walk
-    			if (isPressed(KeyCode.A) ) { //&& player.getTranslateX() >= 5
-    				walkLeft();
-    				this.isWalk = true;
-    				direction = "left";
-    				pastDirection = "left";
-    		    } else if (isPressed(KeyCode.D) ) { //&& player.getTranslateX() + 40 <= levelWidth - 5
-    		    	walkRight();
-    		    	this.isWalk = true;
-    		    	direction = "right";
-    		    	pastDirection = "right";
-    		    }
-        	} 
-    		else if ((isPressed(KeyCode.SPACE) || 
-    				((isPressed(KeyCode.A) || isPressed(KeyCode.D)) && isPressed(KeyCode.SPACE))) ) { // when you press a space bar, player is going to charge
-    		    if (!this.isJump ) {//&& player.getTranslateY() >= 5
-    		    	chargeTime++;
-    		        isCharge = true;
-    		        isWalk = false;
-    		        player.setImage(new Image(ClassLoader.getSystemResource("player/player2_charge.png").toString()));
-    	            if (isPressed(KeyCode.A) && isCharge) { 
-    	            	direction = "chargeLeft";
-    	            } else if (isPressed(KeyCode.D) && isCharge) {
-    	            	direction = "chargeRight";
-    	            } else {
-    	            	direction = "charge";
-    	            }
-    		    }
-    		} else if (!isPressed(KeyCode.A) && !isPressed(KeyCode.D)) { // set image when not walk
-    		    if (pastDirection.equals("right")) {
-//    		    	direction = "freezeRight";
-    		    	player.setImage(new Image(ClassLoader.getSystemResource("player/player2_currentRight.png").toString()));
-    		    } else if (pastDirection.equals("left")){
-    		    	player.setImage(new Image(ClassLoader.getSystemResource("player/player2_currentLeft.png").toString()));
-//    		    	direction = "freezeLeft";
-    		    }
-    		    isWalk = false;
-    		}
+    		movement();
     	}
     	
     	if (this.isCharge) {
@@ -170,144 +153,11 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     	}
     	
     	if (this.isJump) {
-    		if (direction.equals("chargeLeft") || direction.equals("left") || direction.equals("jumpLeft")) { //jump go to left
-    			direction = "jumpLeft";
-    			//this is check collide like walkLeft
-    			for (int i = 0; i < this.getJumpSpeedX(); i++) {
-//    	            boolean collided = false;
-    	            player.setTranslateX(player.getTranslateX() - 1);
-//    	            for (Node platform : platforms) {
-//    	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-//    	                    if (player.getTranslateX() == platform.getTranslateX() + 60) {
-//    	                        collided = true;
-//    	                        break;
-//    	                    }
-//    	                }
-//    	            }
-    	            checkCollisionLeft();
-    	            if (collideLeft) {
-    	            	direction = "jumpRight"; // change direction when collide
-    	            	player.setTranslateX(player.getTranslateX() - 1); // Move the player back to the previous position
-    	            	collideLeft = false;
-    	                break;
-    	            }
-    			}
-    	    	if (playerVelocity.getY() > 0) {
-    	    		direction = "downLeft";
-    	    		this.isJump = false;
-    	    		this.isFalling = true; // go to Falling
-    	    		player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downLeft.png").toString()));
-    	    	} else {
-    	    		player.setImage(new Image(ClassLoader.getSystemResource("player/player2_upLeft.png").toString()));   
-    	    	}
-    	    } else if (direction.equals("chargeRight") || direction.equals("right") ||  direction.equals("jumpRight")) { //jump go to right
-    	    	direction = "jumpRight";
-    	    	//this is check collide like walkRight
-    	    	for (int i = 0; i < this.getJumpSpeedX(); i++) {
-//    	            boolean collided = false;
-    	            player.setTranslateX(player.getTranslateX() + 1);
-//    	            for (Node platform : platforms) {
-//    	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-//    	                    if (player.getTranslateX() + 40 == platform.getTranslateX()) {
-//    	                        collided = true;
-//    	                        break;
-//    	                    }
-//    	                }
-//    	            }
-    	            checkCollisionRight();
-    	            if (collideRight) {
-    	            	direction = "jumpLeft"; // change direction when collide
-    	            	player.setTranslateX(player.getTranslateX() + 1); // Move the player back to the previous position
-    	            	collideRight = false;
-    	                break;
-    	            }
-    			}
-    	    	if (playerVelocity.getY() > 0) {
-    	    		this.isFalling = true; // go to Falling
-    	    		this.isJump = false; 
-    	    		direction = "downRight"; 
-    	    		player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downRight.png").toString()));
-    	    	} else {
-    	    		player.setImage(new Image(ClassLoader.getSystemResource("player/player2_upRight.png").toString()));
-    	    	}
-    	    } else { // jump in Y-Axis only
-    	    	direction = "jump";
-    	    	if (pastDirection.equals("left")) {
-    	    		if (playerVelocity.getY() > 0) {
-    	    			this.isFalling = true;
-        	    		this.isJump = false;
-        	    		direction = "down";
-    	    			player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downLeft.png").toString()));
-        	    	} else {
-        	    		player.setImage(new Image(ClassLoader.getSystemResource("player/player2_upLeft.png").toString()));
-        	    	}
-    	    	} else {
-    	    		if (playerVelocity.getY() > 0) {
-    	    			this.isFalling = true;
-        	    		this.isJump = false;
-        	    		direction = "down";
-    	    			player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downRight.png").toString()));
-        	    	} else {
-        	    		player.setImage(new Image(ClassLoader.getSystemResource("player/player2_upRight.png").toString()));
-        	    	}
-    	    	}
-    	    }
+    		jump();
     	}
     		
     	if (isFalling) { 
-	        if (direction.equals("jumpRight") || direction.equals("downRight")) {
-	        	direction = "downRight";
-	        	for (int i = 0; i < this.getJumpSpeedX(); i++) {
-//    	            boolean collided = false;
-    	            player.setTranslateX(player.getTranslateX() + 1);
-//    	            for (Node platform : platforms) {
-//    	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-//    	                    if (player.getTranslateX() + 40 == platform.getTranslateX()) {
-//    	                        collided = true;
-//    	                        break;
-//    	                    }
-//    	                }
-//    	            }
-	        		checkCollisionRight();
-    	            if (collideRight) {
-    	            	direction = "downLeft";
-    	            	player.setTranslateX(player.getTranslateX() + 1); // Move the player back to the previous position
-    	            	collideRight = false;
-    	                break;
-    	            }
-    			}
-	            player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downRight.png").toString()));
-			} else if (direction.equals("jumpLeft") || direction.equals("downLeft")) {
-				direction = "downLeft";
-				for (int i = 0; i < this.getJumpSpeedX(); i++) {
-//    	            boolean collided = false;
-    	            player.setTranslateX(player.getTranslateX() - 1);
-//    	            for (Node platform : platforms) {
-//    	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-//    	                    if (player.getTranslateX() == platform.getTranslateX() + 60) {
-//    	                        collided = true;
-//    	                        break;
-//    	                    }
-//    	                }
-//    	            }
-    	            checkCollisionLeft();
-    	            if (collideLeft) {
-    	            	direction = "downRight";
-    	            	player.setTranslateX(player.getTranslateX() - 1); // Move the player back to the previous position
-    	            	collideLeft = false;
-    	                break;
-    	            }
-    			}
-	            player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downLeft.png").toString()));
-			} 
-			else if (direction.equals("jump") || direction.equals("down")) {
-				direction = "down";
-				if (pastDirection.equals("left")) {
-					player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downLeft.png").toString()));
-				} else if (pastDirection.equals("right")) {
-					player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downRight.png").toString()));
-				}
-			}	
+	        falling();
 		}
     	
         if (playerVelocity.getY() < this.maxGravity) {
@@ -316,112 +166,18 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 
         movePlayerY((int)playerVelocity.getY()); // like gravity
         
+        isColliedCoin();
         
-        for (Node coin : coins) {
-            if (player.getBoundsInParent().intersects(coin.getBoundsInParent())) {
-            	coin.getProperties().put("alive", false);
-                dialogEvent = true;
-                isFinish = true;
-                isWalk = false;
-            }
-        }
+        removeCoin(gameRoot);
         
-        for (Iterator<Node> it = coins.iterator(); it.hasNext(); ) {
-            Node coin = it.next();
-            if (!(Boolean)coin.getProperties().get("alive")) {
-                it.remove();
-                gameRoot.getChildren().remove(coin);
-            }
-        }
-        
-        for (Node spike : spikes) {
-            if (player.getBoundsInParent().intersects(spike.getBoundsInParent())) {
-                reset(player, gameRoot);
-            }
-        }
+        isColliedSpike(gameRoot);
     }
     
-    public void charge() {
-    	if (chargeTime >= maxChargeTime || chargeTime > 0 && !isPressed(KeyCode.SPACE)) {
-    		yVelocity = 10 + Math.pow(chargeTime/7, 1.4);
-		    chargeTime = 0;// clear chargeTime
-		    isJump = true;
-		    isCharge = false;
-		    isWalk = false;
-		    playerVelocity = playerVelocity.add(0, -yVelocity);
-    	}
-    }
-    
-    public void updateWalkImage() { 
-    	if (this.isWalk) {
-    		if (direction.equals("left")) {
-    			spriteCounter++;
-    			if (spriteCounter > 7) { //control the player's sprite animation.
-    				if (spriteNum == 1) {
-    					spriteNum = 2;
-    					player.setImage(new Image(ClassLoader.getSystemResource("player/player2_walkLeft1.png").toString()));
-    				} else if (spriteNum == 2) {
-    					spriteNum = 3;
-    					player.setImage(new Image(ClassLoader.getSystemResource("player/player2_walkLeft2.png").toString()));
-    				} else if (spriteNum == 3) {
-    					spriteNum = 1;
-    					player.setImage(new Image(ClassLoader.getSystemResource("player/player2_walkLeft3.png").toString()));
-    				} 
-    				spriteCounter = 0;
-    			}
-    		} else if (direction.equals("right")) {
-    			spriteCounter++;
-    			if (spriteCounter > 7) { //control the player's sprite animation.
-    				if (spriteNum == 1) {
-    					spriteNum = 2;
-    					player.setImage(new Image(ClassLoader.getSystemResource("player/player2_walkRight1.png").toString()));
-    				} else if (spriteNum == 2) {
-    					spriteNum = 3;
-    					player.setImage(new Image(ClassLoader.getSystemResource("player/player2_walkRight2.png").toString()));
-    				} else if (spriteNum == 3) {
-    					spriteNum = 1;
-    					player.setImage(new Image(ClassLoader.getSystemResource("player/player2_walkRight3.png").toString()));
-    				} 
-    				spriteCounter = 0;
-    			}
-    		} 
-    	} 
-    }
-    
-    public void checkCollisionLeft() {
-    	for (Node platform : platforms) {
-            if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-                if (player.getTranslateX() == platform.getTranslateX() + 60) { //the player has reached the left edge of the platform
-                    collideLeft = true;
-                    break;
-                }
-            }
-        }
-    }
-    
-    public void checkCollisionRight() {
-    	for (Node platform : platforms) {
-            if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-                if (player.getTranslateX() + 40 == platform.getTranslateX()) { //the player has reached the right edge of the platform
-                    collideRight = true;
-                    break;
-                }
-            }
-        }
-    }
 
     public void walkLeft() {
         for (int i = 0; i < this.getWalkSpeed(); i++) { //to simulate the movement of the player to the left in small increments.
 //            boolean collided = false;
             player.setTranslateX(player.getTranslateX() - 1); //moves the player one unit to the left
-//            for (Node platform : platforms) {
-//                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-//                    if (player.getTranslateX() == platform.getTranslateX() + 60) { //the player has reached the left edge of the platform
-//                        collided = true;
-//                        break;
-//                    }
-//                }
-//            }
             checkCollisionLeft();
             if (collideLeft) {
                 player.setTranslateX(player.getTranslateX() + 1); // Move the player back to the previous position
@@ -436,14 +192,6 @@ public class Player extends Entity implements WalkAble,ChargeAble{
         for (int i = 0; i < this.getWalkSpeed(); i++) { //to simulate the movement of the player to the left in small increments.
 //            boolean collided = false;
             player.setTranslateX(player.getTranslateX() + 1); //moves the player one unit to the right
-//            for (Node platform : platforms) {
-//                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-//                    if (player.getTranslateX() + 40 == platform.getTranslateX()) { //the player has reached the right edge of the platform
-//                        collided = true;
-//                        break;
-//                    }
-//                }
-//            }
             checkCollisionRight();
             if (collideRight) {
                 player.setTranslateX(player.getTranslateX() - 1); // Move the player back to the previous position
@@ -489,8 +237,6 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 		Rectangle entity = new Rectangle(w, h);
         entity.setTranslateX(x);
         entity.setTranslateY(y);
-//        Image image = new Image(path);
-//        entity.setFill(new ImagePattern(image));
         ImageView imageView = new ImageView(new Image(ClassLoader.getSystemResource(path).toString()));
         entity.setFill(new ImagePattern(imageView.getImage()));
         entity.getProperties().put("alive", true);
@@ -516,10 +262,10 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 	public void reset(ImageView player, Pane gameRoot) {
 		isDeath = true;
         count += 1;
-        player.setTranslateX(80);
-        player.setTranslateY(23 * 60);
+        player.setTranslateX(blockSize * 1.5);
+        player.setTranslateY(23 * blockSize);
         gameRoot.setLayoutX(0);
-        gameRoot.setLayoutY(-780);       
+        gameRoot.setLayoutY(-(720 + blockSize));       
 	}
 
 	public int getCount() {
@@ -533,6 +279,280 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 	public void setDeath(boolean death) {
 		this.isDeath = death;
 	}
+	
+	public void movement() {
+		if ((isPressed(KeyCode.A) || isPressed(KeyCode.D)) && !isPressed(KeyCode.SPACE)) { // if it press space bar,will not walk
+			jumpNoWalk();
+    	} 
+		else if ((isPressed(KeyCode.SPACE) || 
+				((isPressed(KeyCode.A) || isPressed(KeyCode.D)) && isPressed(KeyCode.SPACE))) ) { // when you press a space bar, player is going to charge
+		    if (!this.isJump ) {//&& player.getTranslateY() >= 5
+		    	chargeTime++;
+		        isCharge = true;
+		        isWalk = false;
+		        player.setImage(new Image(ClassLoader.getSystemResource("player/player2_charge.png").toString()));
+	            if (isPressed(KeyCode.A) && isCharge) { 
+	            	direction = "chargeLeft";
+	            } else if (isPressed(KeyCode.D) && isCharge) {
+	            	direction = "chargeRight";
+	            } else {
+	            	direction = "charge";
+	            }
+		    }
+		} else if (!isPressed(KeyCode.A) && !isPressed(KeyCode.D)) { // set image when not walk
+		    if (pastDirection.equals("right")) {
+//		    	direction = "freezeRight";
+		    	player.setImage(new Image(ClassLoader.getSystemResource("player/player2_currentRight.png").toString()));
+		    } else if (pastDirection.equals("left")){
+		    	player.setImage(new Image(ClassLoader.getSystemResource("player/player2_currentLeft.png").toString()));
+//		    	direction = "freezeLeft";
+		    }
+		    isWalk = false;
+		}
+	}
+	
+	public void jump() {
+		if (direction.equals("chargeLeft") || direction.equals("left") || direction.equals("jumpLeft")) { //jump go to left
+			direction = "jumpLeft";
+			//this is check collide like walkLeft
+			for (int i = 0; i < this.getJumpSpeedX(); i++) {
+//	            boolean collided = false;
+	            player.setTranslateX(player.getTranslateX() - 1);
+	            checkCollisionLeft();
+	            if (collideLeft) {
+	            	direction = "jumpRight"; // change direction when collide
+	            	player.setTranslateX(player.getTranslateX() - 1); // Move the player back to the previous position
+	            	collideLeft = false;
+	                break;
+	            }
+			}
+	    	if (playerVelocity.getY() > 0) {
+	    		direction = "downLeft";
+	    		this.isJump = false;
+	    		this.isFalling = true; // go to Falling
+	    		player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downLeft.png").toString()));
+	    	} else {
+	    		player.setImage(new Image(ClassLoader.getSystemResource("player/player2_upLeft.png").toString()));   
+	    	}
+	    } else if (direction.equals("chargeRight") || direction.equals("right") ||  direction.equals("jumpRight")) { //jump go to right
+	    	direction = "jumpRight";
+	    	//this is check collide like walkRight
+	    	for (int i = 0; i < this.getJumpSpeedX(); i++) {
+//	            boolean collided = false;
+	            player.setTranslateX(player.getTranslateX() + 1);
+	            checkCollisionRight();
+	            if (collideRight) {
+	            	direction = "jumpLeft"; // change direction when collide
+	            	player.setTranslateX(player.getTranslateX() + 1); // Move the player back to the previous position
+	            	collideRight = false;
+	                break;
+	            }
+			}
+	    	if (playerVelocity.getY() > 0) {
+	    		this.isFalling = true; // go to Falling
+	    		this.isJump = false; 
+	    		direction = "downRight"; 
+	    		player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downRight.png").toString()));
+	    	} else {
+	    		player.setImage(new Image(ClassLoader.getSystemResource("player/player2_upRight.png").toString()));
+	    	}
+	    } else { // jump in Y-Axis only
+	    	direction = "jump";
+	    	if (pastDirection.equals("left")) {
+	    		if (playerVelocity.getY() > 0) {
+	    			this.isFalling = true;
+    	    		this.isJump = false;
+    	    		direction = "down";
+	    			player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downLeft.png").toString()));
+    	    	} else {
+    	    		player.setImage(new Image(ClassLoader.getSystemResource("player/player2_upLeft.png").toString()));
+    	    	}
+	    	} else {
+	    		if (playerVelocity.getY() > 0) {
+	    			this.isFalling = true;
+    	    		this.isJump = false;
+    	    		direction = "down";
+	    			player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downRight.png").toString()));
+    	    	} else {
+    	    		player.setImage(new Image(ClassLoader.getSystemResource("player/player2_upRight.png").toString()));
+    	    	}
+	    	}
+	    }
+	}
+	
+	public void falling() {
+		if (direction.equals("jumpRight") || direction.equals("downRight")) {
+        	direction = "downRight";
+        	for (int i = 0; i < this.getJumpSpeedX(); i++) {
+//	            boolean collided = false;
+	            player.setTranslateX(player.getTranslateX() + 1);
+//	            for (Node platform : platforms) {
+//	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
+//	                    if (player.getTranslateX() + 40 == platform.getTranslateX()) {
+//	                        collided = true;
+//	                        break;
+//	                    }
+//	                }
+//	            }
+        		checkCollisionRight();
+	            if (collideRight) {
+	            	direction = "downLeft";
+	            	player.setTranslateX(player.getTranslateX() + 1); // Move the player back to the previous position
+	            	collideRight = false;
+	                break;
+	            }
+			}
+            player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downRight.png").toString()));
+		} else if (direction.equals("jumpLeft") || direction.equals("downLeft")) {
+			direction = "downLeft";
+			for (int i = 0; i < this.getJumpSpeedX(); i++) {
+//	            boolean collided = false;
+	            player.setTranslateX(player.getTranslateX() - 1);
+//	            for (Node platform : platforms) {
+//	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
+//	                    if (player.getTranslateX() == platform.getTranslateX() + 60) {
+//	                        collided = true;
+//	                        break;
+//	                    }
+//	                }
+//	            }
+	            checkCollisionLeft();
+	            if (collideLeft) {
+	            	direction = "downRight";
+	            	player.setTranslateX(player.getTranslateX() - 1); // Move the player back to the previous position
+	            	collideLeft = false;
+	                break;
+	            }
+			}
+            player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downLeft.png").toString()));
+		} 
+		else if (direction.equals("jump") || direction.equals("down")) {
+			direction = "down";
+			if (pastDirection.equals("left")) {
+				player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downLeft.png").toString()));
+			} else if (pastDirection.equals("right")) {
+				player.setImage(new Image(ClassLoader.getSystemResource("player/player2_downRight.png").toString()));
+			}
+		}	
+	}
+	
+    public void isColliedCoin() {
+    	for (Node coin : coins) {
+            if (player.getBoundsInParent().intersects(coin.getBoundsInParent())) {
+            	coin.getProperties().put("alive", false);
+                dialogEvent = true;
+                isFinish = true;
+                isWalk = false;
+            }
+        }
+    }
     
+    public void removeCoin(Pane gameRoot) {
+    	for (Iterator<Node> it = coins.iterator(); it.hasNext(); ) {
+            Node coin = it.next();
+            if (!(Boolean)coin.getProperties().get("alive")) {
+                it.remove();
+                gameRoot.getChildren().remove(coin);
+            }
+        }
+    }
     
+    public void isColliedSpike(Pane gameRoot) {
+    	for (Node spike : spikes) {
+            if (player.getBoundsInParent().intersects(spike.getBoundsInParent())) {
+                reset(player, gameRoot);
+            }
+        }
+    }
+    
+    public void charge() {
+    	if (chargeTime >= maxChargeTime || chargeTime > 0 && !isPressed(KeyCode.SPACE)) {
+    		yVelocity = 10 + Math.pow(chargeTime/7, 1.4);
+		    chargeTime = 0;// clear chargeTime
+		    isJump = true;
+		    isCharge = false;
+		    isWalk = false;
+		    playerVelocity = playerVelocity.add(0, -yVelocity);
+    	}
+    }
+    
+    public void updateWalkLeft() {
+    	spriteCounter++;
+		if (spriteCounter > 7) { //control the player's sprite animation.
+			if (spriteNum == 1) {
+				spriteNum = 2;
+				player.setImage(new Image(ClassLoader.getSystemResource("player/player2_walkLeft1.png").toString()));
+			} else if (spriteNum == 2) {
+				spriteNum = 3;
+				player.setImage(new Image(ClassLoader.getSystemResource("player/player2_walkLeft2.png").toString()));
+			} else if (spriteNum == 3) {
+				spriteNum = 1;
+				player.setImage(new Image(ClassLoader.getSystemResource("player/player2_walkLeft3.png").toString()));
+			} 
+			spriteCounter = 0;
+		}
+    }
+    
+    public void updateWalkRight() {
+    	spriteCounter++;
+		if (spriteCounter > 7) { //control the player's sprite animation.
+			if (spriteNum == 1) {
+				spriteNum = 2;
+				player.setImage(new Image(ClassLoader.getSystemResource("player/player2_walkRight1.png").toString()));
+			} else if (spriteNum == 2) {
+				spriteNum = 3;
+				player.setImage(new Image(ClassLoader.getSystemResource("player/player2_walkRight2.png").toString()));
+			} else if (spriteNum == 3) {
+				spriteNum = 1;
+				player.setImage(new Image(ClassLoader.getSystemResource("player/player2_walkRight3.png").toString()));
+			} 
+			spriteCounter = 0;
+		}
+    }
+    
+    public void updateWalkImage() { 
+    	if (this.isWalk) {
+    		if (direction.equals("left")) {
+    			updateWalkLeft();
+    		} else if (direction.equals("right")) {
+    			updateWalkRight();
+    		} 
+    	} 
+    }
+    
+    public void checkCollisionLeft() {
+    	for (Node platform : platforms) {
+            if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
+                if (player.getTranslateX() == platform.getTranslateX() + 60) { //the player has reached the left edge of the platform
+                    collideLeft = true;
+                    break;
+                }
+            }
+        }
+    }
+    
+    public void checkCollisionRight() {
+    	for (Node platform : platforms) {
+            if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
+                if (player.getTranslateX() + 40 == platform.getTranslateX()) { //the player has reached the right edge of the platform
+                    collideRight = true;
+                    break;
+                }
+            }
+        }
+    }
+    
+    public void jumpNoWalk() {
+    	if (isPressed(KeyCode.A) ) { //&& player.getTranslateX() >= 5
+			walkLeft();
+			this.isWalk = true;
+			direction = "left";
+			pastDirection = "left";
+	    } else if (isPressed(KeyCode.D) ) { //&& player.getTranslateX() + 40 <= levelWidth - 5
+	    	walkRight();
+	    	this.isWalk = true;
+	    	direction = "right";
+	    	pastDirection = "right";
+	    }
+    }
 }
