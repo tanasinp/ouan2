@@ -26,6 +26,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 	//    private Node player;
     private HashMap<KeyCode, Boolean> keys;
     private int levelWidth;
+    private int levelHeight;
 	private Point2D playerVelocity = new Point2D(0, 0);
 	private ImageView player;// =  new ImageView(new Image(getClass().getResourceAsStream("/res/player_currentRight.png")));
 	private ArrayList<Node> platforms = new ArrayList<>();
@@ -49,31 +50,32 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     
     public int spriteCounter = 0;
 	public int spriteNum = 1;
-	    
     
 	public Player(Pane gameRoot, HashMap<KeyCode, Boolean> keys) {
         this.keys = keys;
         levelWidth = LevelData.LEVEL1[0].length() * 60;
+        levelHeight = LevelData.LEVEL1.length * 60;
 //        player = new ImageView(new Image(getClass().getResourceAsStream("/res/player_currentRight.png")));
 //        player.setFitWidth(40);
 //        player.setFitHeight(40);
 //        player.setTranslateX(80);
 //        player.setTranslateY(60);
-        setDefaultValues();
+        setDefaultValues(gameRoot);
         player.translateXProperty().addListener((obs, old, newValue) -> {
-            int offset = newValue.intValue();
+            int offsetX = newValue.intValue();
+            int offsetY = (int) player.getTranslateY(); // Get the current translateY value
 
-            if (offset > 640 && offset < levelWidth - 640) {
-                gameRoot.setLayoutX(-(offset - 640));
+            if (offsetX > 640 && offsetX < levelWidth - 640) {
+                gameRoot.setLayoutX(-(offsetX - 640));
+            }
+
+            if (offsetY > 380 && offsetY < levelHeight - 380) {
+                gameRoot.setLayoutY(-(offsetY - 380));
             }
         });
-//        player.translateYProperty().addListener((obs, old, newValuey) -> {
-//            int offsety = newValuey.intValue();
-//
-//            if (offsety > 360 && offsety < levelWidth - 360) {
-//                gameRoot.setLayoutX(-(offsety - 360));
-//            }
-//        });
+
+
+
 
         for (int i = 0; i < LevelData.LEVEL1.length; i++) {
             String line = LevelData.LEVEL1[i];
@@ -102,21 +104,24 @@ public class Player extends Entity implements WalkAble,ChargeAble{
         gameRoot.getChildren().addAll(spikes);
     }
 	
-	public void setDefaultValues() {
-		System.out.println(ClassLoader.getSystemResource("map/spike.png"));
+	public void setDefaultValues(Pane gameRoot) {
+//		System.out.println(ClassLoader.getSystemResource("map/spike.png"));
 		player = new ImageView(new Image(ClassLoader.getSystemResource("player/player2_currentRight.png").toString()));
         direction = "right";
         pastDirection = "right";
         player.setFitWidth(40);
         player.setFitHeight(40);
         player.setTranslateX(80);
-        player.setTranslateY(60);
+        player.setTranslateY(23 * 60);
+        gameRoot.setLayoutX(0);
+        gameRoot.setLayoutY(-780);
         isWalk = true;
         isJump = false;
         isCharge = false;
         isFalling = false;
         isDeath = false;
         dialogEvent = false;
+        
 	}
 
     public void update(Pane gameRoot) {
@@ -477,10 +482,11 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     
 	public void reset(ImageView player, Pane gameRoot) {
 		isDeath = true;
-		gameRoot.setLayoutX(0);
-        player.setTranslateX(80);
-        player.setTranslateY(60);
         count += 1;
+        player.setTranslateX(80);
+        player.setTranslateY(23 * 60);
+        gameRoot.setLayoutX(0);
+        gameRoot.setLayoutY(-780);
 //        System.out.println(count);
         
 	}
