@@ -66,9 +66,7 @@ public class Game extends Pane {
 	public void startGameLoop() {
         AnimationTimer timer = new AnimationTimer() {
             public void handle(long now) {
-//                if (running) {
-                    update();
-//                }
+            	update();
 
                 if (player.isDialogEvent()) {
                     player.setDialogEvent(false);

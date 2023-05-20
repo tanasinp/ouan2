@@ -41,9 +41,9 @@ public class MenuPane {
         name.setFont(font96);
         
         control.setText("CONTROL");
-        control1.setText("> Use LEFT/RIGHT ARROW to move left and right!");
-        control2.setText("> Press/Hold SPACEBAR to jump! (the longer you hold the further you go)");
-        control3.setText("> Hold Left/Right arrow while holding jump to jump to that direction");
+        control1.setText("> Use A / D to move left and right!");
+        control2.setText("> Press / Hold SPACEBAR to jump! (the longer you hold the further you go)");
+        control3.setText("> Hold A / D while holding jump to jump to that direction");
         
         control.setFont(font48);
 

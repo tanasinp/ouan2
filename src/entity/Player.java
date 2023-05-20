@@ -42,6 +42,8 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 	public boolean isFalling ;
 	public boolean isFinish = false;
 	
+	public boolean collideLeft;
+	public boolean collideRight;
 	private int chargeTime = 0;
 	private final int maxChargeTime = 80;
 	
@@ -56,11 +58,6 @@ public class Player extends Entity implements WalkAble,ChargeAble{
         this.keys = keys;
         levelWidth = LevelData.LEVEL1[0].length() * 60;
         levelHeight = LevelData.LEVEL1.length * 60;
-//        player = new ImageView(new Image(getClass().getResourceAsStream("/res/player_currentRight.png")));
-//        player.setFitWidth(40);
-//        player.setFitHeight(40);
-//        player.setTranslateX(80);
-//        player.setTranslateY(60);
         setDefaultValues(gameRoot);
         player.translateXProperty().addListener((obs, old, newValue) -> {
             int offsetX = newValue.intValue();
@@ -74,9 +71,6 @@ public class Player extends Entity implements WalkAble,ChargeAble{
                 gameRoot.setLayoutY(-(offsetY - 380));
             }
         });
-
-
-
 
         for (int i = 0; i < LevelData.LEVEL1.length; i++) {
             String line = LevelData.LEVEL1[i];
@@ -106,7 +100,6 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     }
 	
 	public void setDefaultValues(Pane gameRoot) {
-//		System.out.println(ClassLoader.getSystemResource("map/spike.png"));
 		player = new ImageView(new Image(ClassLoader.getSystemResource("player/player2_currentRight.png").toString()));
         direction = "right";
         pastDirection = "right";
@@ -122,6 +115,8 @@ public class Player extends Entity implements WalkAble,ChargeAble{
         isFalling = false;
         isDeath = false;
         dialogEvent = false;
+        collideLeft = false;
+        collideRight = false;
         
 	}
 
@@ -160,9 +155,11 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     		    }
     		} else if (!isPressed(KeyCode.A) && !isPressed(KeyCode.D)) { // set image when not walk
     		    if (pastDirection.equals("right")) {
+//    		    	direction = "freezeRight";
     		    	player.setImage(new Image(ClassLoader.getSystemResource("player/player2_currentRight.png").toString()));
     		    } else if (pastDirection.equals("left")){
     		    	player.setImage(new Image(ClassLoader.getSystemResource("player/player2_currentLeft.png").toString()));
+//    		    	direction = "freezeLeft";
     		    }
     		    isWalk = false;
     		}
@@ -177,19 +174,21 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     			direction = "jumpLeft";
     			//this is check collide like walkLeft
     			for (int i = 0; i < this.getJumpSpeedX(); i++) {
-    	            boolean collided = false;
+//    	            boolean collided = false;
     	            player.setTranslateX(player.getTranslateX() - 1);
-    	            for (Node platform : platforms) {
-    	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-    	                    if (player.getTranslateX() == platform.getTranslateX() + 60) {
-    	                        collided = true;
-    	                        break;
-    	                    }
-    	                }
-    	            }
-    	            if (collided) {
+//    	            for (Node platform : platforms) {
+//    	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
+//    	                    if (player.getTranslateX() == platform.getTranslateX() + 60) {
+//    	                        collided = true;
+//    	                        break;
+//    	                    }
+//    	                }
+//    	            }
+    	            checkCollisionLeft();
+    	            if (collideLeft) {
     	            	direction = "jumpRight"; // change direction when collide
     	            	player.setTranslateX(player.getTranslateX() - 1); // Move the player back to the previous position
+    	            	collideLeft = false;
     	                break;
     	            }
     			}
@@ -205,19 +204,21 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     	    	direction = "jumpRight";
     	    	//this is check collide like walkRight
     	    	for (int i = 0; i < this.getJumpSpeedX(); i++) {
-    	            boolean collided = false;
+//    	            boolean collided = false;
     	            player.setTranslateX(player.getTranslateX() + 1);
-    	            for (Node platform : platforms) {
-    	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-    	                    if (player.getTranslateX() + 40 == platform.getTranslateX()) {
-    	                        collided = true;
-    	                        break;
-    	                    }
-    	                }
-    	            }
-    	            if (collided) {
+//    	            for (Node platform : platforms) {
+//    	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
+//    	                    if (player.getTranslateX() + 40 == platform.getTranslateX()) {
+//    	                        collided = true;
+//    	                        break;
+//    	                    }
+//    	                }
+//    	            }
+    	            checkCollisionRight();
+    	            if (collideRight) {
     	            	direction = "jumpLeft"; // change direction when collide
     	            	player.setTranslateX(player.getTranslateX() + 1); // Move the player back to the previous position
+    	            	collideRight = false;
     	                break;
     	            }
     			}
@@ -257,19 +258,21 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 	        if (direction.equals("jumpRight") || direction.equals("downRight")) {
 	        	direction = "downRight";
 	        	for (int i = 0; i < this.getJumpSpeedX(); i++) {
-    	            boolean collided = false;
+//    	            boolean collided = false;
     	            player.setTranslateX(player.getTranslateX() + 1);
-    	            for (Node platform : platforms) {
-    	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-    	                    if (player.getTranslateX() + 40 == platform.getTranslateX()) {
-    	                        collided = true;
-    	                        break;
-    	                    }
-    	                }
-    	            }
-    	            if (collided) {
+//    	            for (Node platform : platforms) {
+//    	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
+//    	                    if (player.getTranslateX() + 40 == platform.getTranslateX()) {
+//    	                        collided = true;
+//    	                        break;
+//    	                    }
+//    	                }
+//    	            }
+	        		checkCollisionRight();
+    	            if (collideRight) {
     	            	direction = "downLeft";
     	            	player.setTranslateX(player.getTranslateX() + 1); // Move the player back to the previous position
+    	            	collideRight = false;
     	                break;
     	            }
     			}
@@ -277,19 +280,21 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 			} else if (direction.equals("jumpLeft") || direction.equals("downLeft")) {
 				direction = "downLeft";
 				for (int i = 0; i < this.getJumpSpeedX(); i++) {
-    	            boolean collided = false;
+//    	            boolean collided = false;
     	            player.setTranslateX(player.getTranslateX() - 1);
-    	            for (Node platform : platforms) {
-    	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-    	                    if (player.getTranslateX() == platform.getTranslateX() + 60) {
-    	                        collided = true;
-    	                        break;
-    	                    }
-    	                }
-    	            }
-    	            if (collided) {
+//    	            for (Node platform : platforms) {
+//    	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
+//    	                    if (player.getTranslateX() == platform.getTranslateX() + 60) {
+//    	                        collided = true;
+//    	                        break;
+//    	                    }
+//    	                }
+//    	            }
+    	            checkCollisionLeft();
+    	            if (collideLeft) {
     	            	direction = "downRight";
     	            	player.setTranslateX(player.getTranslateX() - 1); // Move the player back to the previous position
+    	            	collideLeft = false;
     	                break;
     	            }
     			}
@@ -318,7 +323,6 @@ public class Player extends Entity implements WalkAble,ChargeAble{
                 dialogEvent = true;
                 isFinish = true;
                 isWalk = false;
-                //System.out.println("congrat");
             }
         }
         
@@ -383,21 +387,45 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     		} 
     	} 
     }
+    
+    public void checkCollisionLeft() {
+    	for (Node platform : platforms) {
+            if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
+                if (player.getTranslateX() == platform.getTranslateX() + 60) { //the player has reached the left edge of the platform
+                    collideLeft = true;
+                    break;
+                }
+            }
+        }
+    }
+    
+    public void checkCollisionRight() {
+    	for (Node platform : platforms) {
+            if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
+                if (player.getTranslateX() + 40 == platform.getTranslateX()) { //the player has reached the right edge of the platform
+                    collideRight = true;
+                    break;
+                }
+            }
+        }
+    }
 
     public void walkLeft() {
         for (int i = 0; i < this.getWalkSpeed(); i++) { //to simulate the movement of the player to the left in small increments.
-            boolean collided = false;
+//            boolean collided = false;
             player.setTranslateX(player.getTranslateX() - 1); //moves the player one unit to the left
-            for (Node platform : platforms) {
-                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-                    if (player.getTranslateX() == platform.getTranslateX() + 60) { //the player has reached the left edge of the platform
-                        collided = true;
-                        break;
-                    }
-                }
-            }
-            if (collided) {
+//            for (Node platform : platforms) {
+//                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
+//                    if (player.getTranslateX() == platform.getTranslateX() + 60) { //the player has reached the left edge of the platform
+//                        collided = true;
+//                        break;
+//                    }
+//                }
+//            }
+            checkCollisionLeft();
+            if (collideLeft) {
                 player.setTranslateX(player.getTranslateX() + 1); // Move the player back to the previous position
+                collideLeft = false;
                 break;
             }
             
@@ -406,18 +434,20 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 
     public void walkRight() {
         for (int i = 0; i < this.getWalkSpeed(); i++) { //to simulate the movement of the player to the left in small increments.
-            boolean collided = false;
+//            boolean collided = false;
             player.setTranslateX(player.getTranslateX() + 1); //moves the player one unit to the right
-            for (Node platform : platforms) {
-                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-                    if (player.getTranslateX() + 40 == platform.getTranslateX()) { //the player has reached the right edge of the platform
-                        collided = true;
-                        break;
-                    }
-                }
-            }
-            if (collided) {
+//            for (Node platform : platforms) {
+//                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
+//                    if (player.getTranslateX() + 40 == platform.getTranslateX()) { //the player has reached the right edge of the platform
+//                        collided = true;
+//                        break;
+//                    }
+//                }
+//            }
+            checkCollisionRight();
+            if (collideRight) {
                 player.setTranslateX(player.getTranslateX() - 1); // Move the player back to the previous position
+                collideRight = false;
                 break;
             }
         }
@@ -489,9 +519,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
         player.setTranslateX(80);
         player.setTranslateY(23 * 60);
         gameRoot.setLayoutX(0);
-        gameRoot.setLayoutY(-780);
-//        System.out.println(count);
-        
+        gameRoot.setLayoutY(-780);       
 	}
 
 	public int getCount() {
