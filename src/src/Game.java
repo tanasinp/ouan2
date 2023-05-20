@@ -14,6 +14,8 @@ import javafx.stage.Stage;
 
 import java.util.HashMap;
 
+import entity.Player;
+
 public class Game extends Pane {
     private HashMap<KeyCode, Boolean> keys = new HashMap<>();
     private Pane appRoot = new Pane();
@@ -23,7 +25,7 @@ public class Game extends Pane {
     private Pane deathRoot = new Pane();
 
     private Player player;
-    private boolean running = true;
+//    private boolean running = true;
     private static Sound sound;
     private GameDialog dialog;
     private MenuPane menuPane;
@@ -64,9 +66,9 @@ public class Game extends Pane {
 	public void startGameLoop() {
         AnimationTimer timer = new AnimationTimer() {
             public void handle(long now) {
-                if (running) {
+//                if (running) {
                     update();
-                }
+//                }
 
                 if (player.isDialogEvent()) {
                     player.setDialogEvent(false);

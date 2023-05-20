@@ -9,7 +9,8 @@ public class Sound {
 	
 
 	public Sound() {
-		Media audio = new Media(getClass().getClassLoader().getResource("res/BgMusic.wav").toExternalForm());
+		System.out.println(ClassLoader.getSystemResource("music/BgMusic.wav"));
+		Media audio = new Media(getClass().getClassLoader().getResource("music/BgMusic.wav").toExternalForm());
 		this.sound = new MediaPlayer(audio);
 		sound.setCycleCount(MediaPlayer.INDEFINITE);
 	}
