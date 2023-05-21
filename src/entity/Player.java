@@ -153,11 +153,11 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     	}
     	
     	if (this.isJump) {
-    		jump();
+    		isJump();
     	}
     		
     	if (isFalling) { 
-	        falling();
+	        isFalling();
 		}
     	
         if (playerVelocity.getY() < this.maxGravity) {
@@ -311,7 +311,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 		}
 	}
 	
-	public void jump() {
+	public void isJump() {
 		if (direction.equals("chargeLeft") || direction.equals("left") || direction.equals("jumpLeft")) { //jump go to left
 			direction = "jumpLeft";
 			//this is check collide like walkLeft
@@ -380,7 +380,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 	    }
 	}
 	
-	public void falling() {
+	public void isFalling() {
 		if (direction.equals("jumpRight") || direction.equals("downRight")) {
         	direction = "downRight";
         	for (int i = 0; i < this.getJumpSpeedX(); i++) {
