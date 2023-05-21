@@ -1,19 +1,14 @@
 package entity;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
 import src.LevelData;
-import javafx.geometry.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,12 +18,11 @@ import ability.WalkAble;
 
 public class Player extends Entity implements WalkAble,ChargeAble{
 
-	//    private Node player;
     private HashMap<KeyCode, Boolean> keys;
     private int levelWidth;
     private int levelHeight;
 	private Point2D playerVelocity = new Point2D(0, 0);
-	private ImageView player;// =  new ImageView(new Image(getClass().getResourceAsStream("/res/player_currentRight.png")));
+	private ImageView player;
 	private ArrayList<Node> platforms = new ArrayList<>();
 	private ArrayList<Node> coins = new ArrayList<Node>();
 	private ArrayList<Node> spikes = new ArrayList<>();
@@ -47,7 +41,6 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 	private int chargeTime = 0;
 	private final int maxChargeTime = 80;
 	
-	//protected final double gravity = 0.9;
     private double yVelocity; // up 
     private double maxGravity = 10;
     
@@ -62,23 +55,20 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     
 	public Player(Pane gameRoot, HashMap<KeyCode, Boolean> keys) {
         this.keys = keys;
-        levelWidth = LevelData.LEVEL1[0].length() * blockSize;
-        levelHeight = LevelData.LEVEL1.length * blockSize;
+        levelWidth = LevelData.LEVEL1[0].length() * blockSize;	//map width
+        levelHeight = LevelData.LEVEL1.length * blockSize;		//map height
         setDefaultValues(gameRoot);
-//        player.translateXProperty().addListener((obs, old, newValue) -> {
-//            int offsetX = newValue.intValue();
-//            int offsetY = (int) player.getTranslateY(); // Get the current translateY value
-//
-//            if (offsetX > 640 && offsetX < levelWidth - 640) {
-//                gameRoot.setLayoutX(-(offsetX - 640));
-//            }
-//
-//            if (offsetY > 360 && offsetY < levelHeight - 360) {
-//                gameRoot.setLayoutY(-(offsetY - 360));
-//            }
-//        });
-        
-        player.translateXProperty().addListener((obs, old, newValueX) -> {
+        camera(gameRoot);
+        createBlock();
+        gameRoot.getChildren().add(player);
+        gameRoot.getChildren().addAll(platforms);
+        gameRoot.getChildren().addAll(coins);
+        gameRoot.getChildren().addAll(spikes);
+    }
+	
+	public void camera(Pane gameRoot) {
+		//camera in x axis
+		player.translateXProperty().addListener((obs, old, newValueX) -> {
         	int offsetX = newValueX.intValue();
 
         	if (offsetX > width/2 && offsetX < levelWidth - width/2) {
@@ -86,7 +76,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
         	}
         });
         
-        
+        //camera in y axis
         player.translateYProperty().addListener((obs, old, newValueY) -> {
             int offsetY = newValueY.intValue();
 
@@ -94,33 +84,30 @@ public class Player extends Entity implements WalkAble,ChargeAble{
                 gameRoot.setLayoutY(-(offsetY - height/2));
             }
         });
-
-        for (int i = 0; i < LevelData.LEVEL1.length; i++) {
+	}
+	
+	public void createBlock(){
+		for (int i = 0; i < LevelData.LEVEL1.length; i++) {
             String line = LevelData.LEVEL1[i];
             for (int j = 0; j < line.length(); j++) {
                 switch (line.charAt(j)) {
                     case '0':
                         break;
-                    case '1':
+                    case '1':	//create normal block
                         Node platform = createEntity(j * blockSize, i * blockSize, blockSize, blockSize, "map/block.png");
                         platforms.add(platform);
                         break;
-                    case '2':
+                    case '2':	//create treasure chest
                         Node coin = createEntity(j * blockSize, i * blockSize, blockSize, blockSize, "map/treasure.png");
                         coins.add(coin);
                         break;
-                    case '3':
+                    case '3':	//create spike
                     	Node spike = createEntity(j * blockSize, i * blockSize, blockSize, blockSize, "map/spike.png");
                     	spikes.add(spike);
                 }
             }
         }
-        
-        gameRoot.getChildren().add(player);
-        gameRoot.getChildren().addAll(platforms);
-        gameRoot.getChildren().addAll(coins);
-        gameRoot.getChildren().addAll(spikes);
-    }
+	}
 	
 	public void setDefaultValues(Pane gameRoot) {
 		player = new ImageView(new Image(ClassLoader.getSystemResource("player/player2_currentRight.png").toString()));
@@ -167,11 +154,8 @@ public class Player extends Entity implements WalkAble,ChargeAble{
         }
 
         movePlayerY((int)playerVelocity.getY()); // like gravity
-        
         isColliedCoin();
-        
         removeCoin(gameRoot);
-        
         isColliedSpike(gameRoot);
     }
     
@@ -210,7 +194,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
             	 if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
                     if (movingDown) {
                     	this.isJump = false;
-                        if (player.getTranslateY() + 40 == platform.getTranslateY()) { // check collide Bottom
+                        if (player.getTranslateY() + playerSize == platform.getTranslateY()) { // check collide Bottom
                             player.setTranslateY(player.getTranslateY() - 1); //This helps the player ascend vertically on the screen
                             this.isJump = false; 
                             this.isFalling = false;
@@ -218,7 +202,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
                         } 
                     }
                     else {//moving up
-                        if (player.getTranslateY() == platform.getTranslateY() + 60) { //check collide top
+                        if (player.getTranslateY() == platform.getTranslateY() + blockSize) { //check collide top
                         	this.isFalling = true; // go to falling
                         	playerVelocity = new Point2D(0, 0); 
                             return;
@@ -340,7 +324,6 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 	    	direction = "jumpRight";
 	    	//this is check collide like walkRight
 	    	for (int i = 0; i < this.getJumpSpeedX(); i++) {
-//	            boolean collided = false;
 	            player.setTranslateX(player.getTranslateX() + 1);
 	            checkCollisionRight();
 	            if (collideRight) {
@@ -386,16 +369,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 		if (direction.equals("jumpRight") || direction.equals("downRight")) {
         	direction = "downRight";
         	for (int i = 0; i < this.getJumpSpeedX(); i++) {
-//	            boolean collided = false;
 	            player.setTranslateX(player.getTranslateX() + 1);
-//	            for (Node platform : platforms) {
-//	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-//	                    if (player.getTranslateX() + 40 == platform.getTranslateX()) {
-//	                        collided = true;
-//	                        break;
-//	                    }
-//	                }
-//	            }
         		checkCollisionRight();
 	            if (collideRight) {
 	            	direction = "downLeft";
@@ -408,16 +382,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 		} else if (direction.equals("jumpLeft") || direction.equals("downLeft")) {
 			direction = "downLeft";
 			for (int i = 0; i < this.getJumpSpeedX(); i++) {
-//	            boolean collided = false;
 	            player.setTranslateX(player.getTranslateX() - 1);
-//	            for (Node platform : platforms) {
-//	                if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-//	                    if (player.getTranslateX() == platform.getTranslateX() + 60) {
-//	                        collided = true;
-//	                        break;
-//	                    }
-//	                }
-//	            }
 	            checkCollisionLeft();
 	            if (collideLeft) {
 	            	direction = "downRight";
@@ -438,7 +403,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 		}	
 	}
 	
-    public void isColliedCoin() {
+    public void isColliedCoin() {	//check collision with coin
     	for (Node coin : coins) {
             if (player.getBoundsInParent().intersects(coin.getBoundsInParent())) {
             	coin.getProperties().put("alive", false);
@@ -449,7 +414,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
         }
     }
     
-    public void removeCoin(Pane gameRoot) {
+    public void removeCoin(Pane gameRoot) {	//remove coin from the map
     	for (Iterator<Node> it = coins.iterator(); it.hasNext(); ) {
             Node coin = it.next();
             if (!(Boolean)coin.getProperties().get("alive")) {
@@ -459,7 +424,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
         }
     }
     
-    public void isColliedSpike(Pane gameRoot) {
+    public void isColliedSpike(Pane gameRoot) {		//check collision with spike
     	for (Node spike : spikes) {
             if (player.getBoundsInParent().intersects(spike.getBoundsInParent())) {
                 reset(player, gameRoot);
@@ -525,7 +490,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     public void checkCollisionLeft() {
     	for (Node platform : platforms) {
             if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-                if (player.getTranslateX() == platform.getTranslateX() + 60) { //the player has reached the left edge of the platform
+                if (player.getTranslateX() == platform.getTranslateX() + blockSize) { //the player has reached the left edge of the platform
                     collideLeft = true;
                     break;
                 }
@@ -536,7 +501,7 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     public void checkCollisionRight() {
     	for (Node platform : platforms) {
             if (player.getBoundsInParent().intersects(platform.getBoundsInParent())) {
-                if (player.getTranslateX() + 40 == platform.getTranslateX()) { //the player has reached the right edge of the platform
+                if (player.getTranslateX() + playerSize == platform.getTranslateX()) { //the player has reached the right edge of the platform
                     collideRight = true;
                     break;
                 }
@@ -545,12 +510,12 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     }
     
     public void jumpNoWalk() {
-    	if (isPressed(KeyCode.A) ) { //&& player.getTranslateX() >= 5
+    	if (isPressed(KeyCode.A) ) {
 			walkLeft();
 			this.isWalk = true;
 			direction = "left";
 			pastDirection = "left";
-	    } else if (isPressed(KeyCode.D) ) { //&& player.getTranslateX() + 40 <= levelWidth - 5
+	    } else if (isPressed(KeyCode.D) ) {
 	    	walkRight();
 	    	this.isWalk = true;
 	    	direction = "right";

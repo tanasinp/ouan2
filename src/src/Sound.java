@@ -9,17 +9,16 @@ public class Sound {
 	
 
 	public Sound() {
-//		System.out.println(ClassLoader.getSystemResource("music/BgMusic.wav"));
-		Media audio = new Media(getClass().getClassLoader().getResource("music/BgMusic.wav").toExternalForm());
+		Media audio = new Media(getClass().getClassLoader().getResource("music/BgMusic.wav").toExternalForm());	//getting sound
 		this.sound = new MediaPlayer(audio);
-		sound.setCycleCount(MediaPlayer.INDEFINITE);
+		sound.setCycleCount(MediaPlayer.INDEFINITE);	//loop sound for infinite
 	}
 
-	public void playSound() {
+	public void playSound() {	//play sound
 		sound.play();
 	}
 
-	public void stopSound() {
+	public void stopSound() {	//stop sound
 		sound.stop();
 	}
 

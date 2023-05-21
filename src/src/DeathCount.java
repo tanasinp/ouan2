@@ -10,16 +10,16 @@ public class DeathCount {
     private int count;
 
     public DeathCount(Player player, Pane deathRoot) {
-        count = player.getCount();
+        count = player.getCount();	//get death count
         countText.setText("Death: " + count);
         countText.setStyle("-fx-fill: black; -fx-font-size: 32; -fx-font-weight: bold;");
 
-        countText.setTranslateX(20);
+        countText.setTranslateX(20);	//set it at the top left of window
         countText.setTranslateY(40);
         deathRoot.getChildren().add(countText);
     }
 
-    public void updateCount(int newCount) {
+    public void updateCount(int newCount) {	//update death count. when player died, death count will + 1
         count = newCount;
         countText.setText("Death: " + count);
     }

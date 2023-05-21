@@ -3,7 +3,7 @@ package src;
 
 public class LevelData {
 
-    public static final String[] LEVEL1 = new String[] {
+    public static final String[] LEVEL1 = new String[] {	//in game map
     		"111111111111111111111111111111",
             "300000000000000000000000000001",
             "100000000000002000000000000001",

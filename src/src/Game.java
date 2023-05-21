@@ -25,7 +25,6 @@ public class Game extends Pane {
     private Pane deathRoot = new Pane();
 
     private Player player;
-//    private boolean running = true;
     private static Sound sound;
     private GameDialog dialog;
     private MenuPane menuPane;
@@ -40,21 +39,26 @@ public class Game extends Pane {
         dialog = new GameDialog(player);
         menuPane = new MenuPane(menuRoot, this);
         
+        //in game pane
         appRoot.getChildren().addAll(gameRoot, congratRoot, deathRoot);
         appRoot.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, null, null)));
-        
         appRoot.setVisible(false);
+        
         deathcount = new DeathCount(player, deathRoot);
+        
+        //main pane
         menuRoot.getChildren().addAll(appRoot);
 
+        //set scene
         Scene scene = new Scene(menuRoot);
         scene.setOnKeyPressed(event -> keys.put(event.getCode(), true));
         scene.setOnKeyReleased(event -> keys.put(event.getCode(), false));
 
+        //play sound
         sound = new Sound();
         sound.playSound();
 
-        primaryStage.setTitle("Jump! JUMP! JUmp! :)");
+        primaryStage.setTitle("Jump! JUMP! JUmp! :)");	//set title
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -67,13 +71,15 @@ public class Game extends Pane {
         AnimationTimer timer = new AnimationTimer() {
             public void handle(long now) {
             	update();
-
+            	
+            	//end game show word "congratulations!"
                 if (player.isDialogEvent()) {
                     player.setDialogEvent(false);
                     dialog.open(congratRoot);
                     sound.stopSound();
                 }
                 
+                //update death count
                 if (player.isDeath()) {
                     player.setDeath(false);
                     deathcount.updateCount(player.getCount());
@@ -85,7 +91,5 @@ public class Game extends Pane {
 
     private void update() {
         player.update(gameRoot);
-
-        // Handle collisions or other game logic here
     }
 }
