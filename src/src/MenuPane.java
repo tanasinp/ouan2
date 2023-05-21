@@ -22,7 +22,6 @@ public class MenuPane {
     private Button start = new Button();
     private Button quit = new Button();
     private Text name = new Text();
-    private Game game;
     private Text control = new Text();
     private Text control1 = new Text();
     private Text control2 = new Text();

@@ -36,14 +36,14 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 	private int count;
 	private boolean isDeath ;
 	
-	public boolean isJump ;
-	public boolean isCharge ;
-	public  boolean isWalk ;
-	public boolean isFalling ;
-	public boolean isFinish = false;
+	private boolean isJump ;
+	private boolean isCharge ;
+	private  boolean isWalk ;
+	private boolean isFalling ;
+	private boolean isFinish = false;
 	
-	public boolean collideLeft;
-	public boolean collideRight;
+	private boolean collideLeft;
+	private boolean collideRight;
 	private int chargeTime = 0;
 	private final int maxChargeTime = 80;
 	
@@ -51,11 +51,14 @@ public class Player extends Entity implements WalkAble,ChargeAble{
     private double yVelocity; // up 
     private double maxGravity = 10;
     
-    public int spriteCounter = 0;
-	public int spriteNum = 1;
+    private int spriteCounter = 0;
+	private int spriteNum = 1;
 	
-	public int blockSize = 60;
-	public int playerSize = 40;
+	private int blockSize = 60;
+	private int playerSize = 40;
+	
+	private int width = 1280;
+	private int height = 720;
     
 	public Player(Pane gameRoot, HashMap<KeyCode, Boolean> keys) {
         this.keys = keys;
@@ -78,8 +81,8 @@ public class Player extends Entity implements WalkAble,ChargeAble{
         player.translateXProperty().addListener((obs, old, newValueX) -> {
         	int offsetX = newValueX.intValue();
 
-        	if (offsetX > 640 && offsetX < levelWidth - 640) {
-        		gameRoot.setLayoutX(-(offsetX - 640));
+        	if (offsetX > width/2 && offsetX < levelWidth - width/2) {
+        		gameRoot.setLayoutX(-(offsetX - width/2));
         	}
         });
         
@@ -87,8 +90,8 @@ public class Player extends Entity implements WalkAble,ChargeAble{
         player.translateYProperty().addListener((obs, old, newValueY) -> {
             int offsetY = newValueY.intValue();
 
-            if (offsetY > 360 && offsetY < levelHeight - 360) {
-                gameRoot.setLayoutY(-(offsetY - 360));
+            if (offsetY > height/2 && offsetY < levelHeight - height/2) {
+                gameRoot.setLayoutY(-(offsetY - height/2));
             }
         });
 
@@ -126,9 +129,9 @@ public class Player extends Entity implements WalkAble,ChargeAble{
         player.setFitWidth(playerSize);
         player.setFitHeight(playerSize);
         player.setTranslateX(blockSize);
-        player.setTranslateY(23 * blockSize);
+        player.setTranslateY((levelHeight/blockSize-2) * blockSize);
         gameRoot.setLayoutX(0);
-        gameRoot.setLayoutY(-(720 + blockSize));
+        gameRoot.setLayoutY(-(height + blockSize));
         isWalk = true;
         isJump = false;
         isCharge = false;
@@ -137,7 +140,6 @@ public class Player extends Entity implements WalkAble,ChargeAble{
         dialogEvent = false;
         collideLeft = false;
         collideRight = false;
-        
 	}
 
     public void update(Pane gameRoot) {
@@ -263,9 +265,9 @@ public class Player extends Entity implements WalkAble,ChargeAble{
 		isDeath = true;
         count += 1;
         player.setTranslateX(blockSize * 1.5);
-        player.setTranslateY(23 * blockSize);
+        player.setTranslateY((levelHeight/blockSize-2) * blockSize);
         gameRoot.setLayoutX(0);
-        gameRoot.setLayoutY(-(720 + blockSize));       
+        gameRoot.setLayoutY(-(height + blockSize));       
 	}
 
 	public int getCount() {
