@@ -28,24 +28,23 @@ public class MenuPane {
     private Text control3 = new Text();
 
     public MenuPane(Pane menuPane, Game game) {
-        start.setText("START");
+        start.setText("START");	//start button 
         start.setFont(font48);
         start.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
 
-        quit.setText("QUIT");
+        quit.setText("QUIT");	//quit button
         quit.setFont(font48);
         quit.setStyle("-fx-background-color: #F44336; -fx-text-fill: white;");
 
-        name.setText("Jump! JUMP! JUmp!");
+        name.setText("Jump! JUMP! JUmp!");	//game name text
         name.setFont(font96);
         
-        control.setText("CONTROL");
-        control1.setText("> Use A / D to move left and right!");
-        control2.setText("> Press / Hold SPACEBAR to jump! (the longer you hold the further you go)");
-        control3.setText("> Hold A / D while holding jump to jump to that direction");
+        control.setText("CONTROL");		//movement text
+        control1.setText("> Use A / D to move left and right!");	//description of movement number 1
+        control2.setText("> Press / Hold SPACEBAR to jump! (the longer you hold the further you go)");	//description of movement number 2
+        control3.setText("> Hold A / D while holding jump to jump to that direction");	//description of movement number 3
         
         control.setFont(font48);
-
         control1.setFont(font24);
         control2.setFont(font24);
         control3.setFont(font24);
@@ -55,17 +54,15 @@ public class MenuPane {
         vbox.setAlignment(Pos.CENTER);
         vbox.setPadding(new Insets(100, 0, 0, 200));
 
-        start.setOnAction(event -> {
+        start.setOnAction(event -> {	//when click start button going into the game
             game.getAppRoot().setVisible(true);
             menuPane.getChildren().removeAll(vbox); // Remove menu elements
         });
 
-        quit.setOnAction(event -> System.exit(0));
+        quit.setOnAction(event -> System.exit(0));	//when click quit button, exit the game
 
-//        menuPane.setPrefHeight(720);
-//        menuPane.setPrefWidth(1280);
         menuPane.getChildren().addAll(vbox);
-        menuPane.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+        menuPane.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, null, null)));
     }
 }
 
